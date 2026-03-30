@@ -12,7 +12,7 @@ const App = () => {
     meter: ''
   });
 
-  // Pautan dari tangkapan skrin yang anda berikan (Screnshot 2026-03-30 225337 & 225417)
+  // Pautan dari tangkapan skrin yang anda berikan
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/1_CX7JDm7xl-YGGpyZpZnPfYBKou_-TRjtDaFOg4fsl/edit";
   const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/18zV8uClYgd-0eZlja9ul6vkRJq4v0mWh";
 
@@ -31,6 +31,7 @@ const App = () => {
       }
     } catch (err) {
       console.error("Ralat akses kamera:", err);
+      setIsCameraOpen(false);
     }
   };
 
@@ -40,7 +41,8 @@ const App = () => {
     if (video && canvas) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
       const dataUrl = canvas.toDataURL('image/png');
       setImage(dataUrl);
       stopCamera();
@@ -56,7 +58,6 @@ const App = () => {
     setIsCameraOpen(false);
   };
 
-  // Fungsi OCR diperkukuh untuk Jawi, BM, dan BI
   const processImage = async (base64Data) => {
     setLoading(true);
     try {
@@ -98,7 +99,6 @@ const App = () => {
 
   const handleSave = () => {
     setLoading(true);
-    // Simulasi penghantaran data
     setTimeout(() => {
       alert(`Data berjaya dihantar ke Google Sheets: DATA BUKU`);
       setLoading(false);
