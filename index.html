@@ -12,7 +12,7 @@ const App = () => {
     meter: ''
   });
 
-  // Pautan dari tangkapan skrin yang anda berikan
+  // Pautan dari tangkapan skrin yang anda berikan (Screnshot 2026-03-30 225337 & 225417)
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/1_CX7JDm7xl-YGGpyZpZnPfYBKou_-TRjtDaFOg4fsl/edit";
   const DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/18zV8uClYgd-0eZlja9ul6vkRJq4v0mWh";
 
@@ -98,8 +98,9 @@ const App = () => {
 
   const handleSave = () => {
     setLoading(true);
+    // Simulasi penghantaran data
     setTimeout(() => {
-      alert(`Data berjaya dihantar ke Google Sheets!`);
+      alert(`Data berjaya dihantar ke Google Sheets: DATA BUKU`);
       setLoading(false);
     }, 1500);
   };
@@ -117,7 +118,7 @@ const App = () => {
           </h1>
         </div>
         <div className="flex gap-2">
-          <a href={SHEET_URL} target="_blank" rel="noreferrer" className="p-2 text-slate-400 hover:text-green-600 transition-colors">
+          <a href={SHEET_URL} target="_blank" rel="noreferrer" title="Buka Google Sheets" className="p-2 text-slate-400 hover:text-green-600 transition-colors">
             <ExternalLink size={18} />
           </a>
         </div>
@@ -177,6 +178,17 @@ const App = () => {
           </div>
         </div>
 
+        {/* Pautan Drive Cepat */}
+        <div className="px-4 py-3 bg-white rounded-xl border border-slate-200 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-2 text-slate-600 font-bold text-[10px] uppercase tracking-wider">
+            <ImageIcon size={14} className="text-red-600" />
+            Folder Gambar
+          </div>
+          <a href={DRIVE_FOLDER_URL} target="_blank" rel="noreferrer" className="bg-red-50 text-red-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase hover:bg-red-100 transition-colors">
+            Lihat Drive
+          </a>
+        </div>
+
         {/* Borang Input */}
         <div className="space-y-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
           <div className="space-y-1.5">
@@ -204,7 +216,7 @@ const App = () => {
                 name="tahun"
                 value={formData.tahun}
                 onChange={handleInputChange}
-                placeholder="1994"
+                placeholder="cth: 1994"
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none transition-all"
               />
             </div>
