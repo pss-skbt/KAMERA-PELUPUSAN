@@ -3,275 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pelupusan Smart AI</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>Kamera Pelupusan Pintar</title>
+    <!-- Memuatkan Tesseract.js daripada CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Lucide Icons untuk estetika UI -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: #f1f5f9;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
         }
-        .loader-ring {
-            border: 4px solid rgba(255,255,255,0.2);
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
             border-radius: 50%;
-            border-top: 4px solid #ef4444;
-            width: 40px;
-            height: 40px;
+            width: 24px;
+            height: 24px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.5);
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-primary {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="bg-slate-50 min-h-screen">
 
-    <script type="text/babel">
-        const { useState, useRef, useEffect } = React;
+    <div class="max-w-xl mx-auto py-10 px-4">
+        <!-- Header Section -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center p-3 bg-blue-600 rounded-2xl shadow-lg mb-4 text-white">
+                <i data-lucide="camera" class="w-8 h-8"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">KAMERA PELUPUSAN PINTAR</h1>
+            <p class="text-slate-500 mt-2 font-medium">Sistem Pengurusan Rekod & Pelupusan Bahan</p>
+        </div>
 
-        const App = () => {
-            const [image, setImage] = useState(null);
-            const [isCameraOpen, setIsCameraOpen] = useState(false);
-            const [loading, setLoading] = useState(false);
-            const [statusMsg, setStatusMsg] = useState("");
-            const [formData, setFormData] = useState({
-                tajuk: '', tahun: '', bil: '1', meter: ''
-            });
-
-            // SCRIPT_URL deployment terkini
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxnRxOdSHwHbyCothHHzghCaUDln5EI9tlH9KIMrxxMitYl8eS8MzYclq273NErYyvLXg/exec";
-            const SHEET_URL = "https://docs.google.com/spreadsheets/d/1_CX7JDm7xl-YGGpyZpZnPfYBKou_-TRjtDaFOg4fsl/edit";
-
-            const videoRef = useRef(null);
-            const canvasRef = useRef(null);
-
-            const startCamera = async () => {
-                setIsCameraOpen(true);
-                setImage(null);
-                setStatusMsg("");
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: 'environment', 
-                            width: { ideal: 1920 },
-                            height: { ideal: 1080 }
-                        } 
-                    });
-                    if (videoRef.current) videoRef.current.srcObject = stream;
-                } catch (err) {
-                    alert("Akses kamera ditolak atau tidak tersedia.");
-                    setIsCameraOpen(false);
-                }
-            };
-
-            const takePhoto = () => {
-                const video = videoRef.current;
-                const canvas = canvasRef.current;
-                if (!video) return;
-
-                const targetWidth = 1080;
-                const scale = targetWidth / video.videoWidth;
-                canvas.width = targetWidth;
-                canvas.height = video.videoHeight * scale;
+        <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 overflow-hidden border border-slate-100">
+            
+            <!-- Camera Viewfinder -->
+            <div class="relative bg-slate-900 aspect-[4/3] flex items-center justify-center">
+                <video id="camera-preview" autoplay playsinline class="w-full h-full object-cover"></video>
+                <canvas id="capture-canvas" class="hidden"></canvas>
                 
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                <!-- Overlay Grid for Focus -->
+                <div id="camera-overlay" class="absolute inset-0 border-2 border-dashed border-white/30 m-8 pointer-events-none rounded-lg hidden"></div>
                 
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-                setImage(dataUrl);
-                
-                const stream = video.srcObject;
-                if (stream) stream.getTracks().forEach(t => t.stop());
-                setIsCameraOpen(false);
+                <!-- Placeholder when camera is off -->
+                <div id="camera-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+                    <i data-lucide="image" class="w-12 h-12 mb-3 opacity-20"></i>
+                    <p class="text-sm text-slate-500">Kamera Sedia Untuk Digunakan</p>
+                </div>
+            </div>
 
-                processAI(dataUrl.split(',')[1]);
-            };
-
-            const processAI = async (base64) => {
-                setLoading(true);
-                setStatusMsg("AI Membaca Teks Buku...");
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: "scan_image", imageRaw: base64 })
-                    });
+            <div class="p-6">
+                <!-- Control Buttons -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button id="btn-start-camera" class="btn-primary flex items-center justify-center space-x-2 bg-slate-900 text-white py-3.5 px-4 rounded-xl font-semibold hover:bg-slate-800 shadow-md">
+                        <i data-lucide="video" class="w-5 h-5"></i>
+                        <span>Buka Kamera</span>
+                    </button>
                     
-                    if (!response.ok) throw new Error("Gagal menghubungi server.");
-                    
-                    const result = await response.json();
-                    
-                    if (result.tajuk || result.tahun) {
-                        setFormData(prev => ({
-                            ...prev,
-                            tajuk: result.tajuk || prev.tajuk,
-                            tahun: result.tahun || prev.tahun
-                        }));
-                        setStatusMsg("Imbasan Selesai!");
-                    } else {
-                        setStatusMsg("AI Gagal mengesan teks pada buku.");
-                    }
-                } catch (err) {
-                    console.error(err);
-                    setStatusMsg("Gagal Menghubungi AI.");
-                } finally {
-                    setLoading(false);
-                }
-            };
+                    <button id="btn-snap" class="btn-primary flex items-center justify-center space-x-2 bg-blue-600 text-white py-3.5 px-4 rounded-xl font-semibold hover:bg-blue-700 shadow-md shadow-blue-200 hidden">
+                        <i data-lucide="aperture" class="w-5 h-5"></i>
+                        <span>Ambil Gambar</span>
+                    </button>
 
-            const handleSave = async () => {
-                if (!formData.tajuk || !image) return alert("Sila ambil gambar dan pastikan tajuk diisi.");
-                
-                setLoading(true);
-                setStatusMsg("Menyimpan Rekod...");
-                try {
-                    const payload = {
-                        action: "save_data",
-                        ...formData,
-                        id: "PLP-" + Math.random().toString(36).substr(2, 6).toUpperCase(),
-                        tarikh: new Date().toLocaleString('ms-MY'),
-                        imageRaw: image.split(',')[1]
-                    };
-                    
-                    await fetch(SCRIPT_URL, { 
-                        method: 'POST', 
-                        mode: 'no-cors', 
-                        body: JSON.stringify(payload) 
-                    });
-                    
-                    alert("Rekod Berjaya Disimpan ke Google Sheets!");
-                    setFormData({ tajuk: '', tahun: '', bil: '1', meter: '' });
-                    setImage(null);
-                    setStatusMsg("");
-                } catch (e) {
-                    alert("Ralat semasa menyimpan.");
-                    setStatusMsg("Gagal Menyimpan.");
-                } finally {
-                    setLoading(false);
-                }
-            };
+                    <label for="gambar-input" class="btn-primary cursor-pointer flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-3.5 px-4 rounded-xl font-semibold hover:bg-slate-200">
+                        <i data-lucide="upload" class="w-5 h-5"></i>
+                        <span>Muat Naik</span>
+                    </label>
+                    <input type="file" id="gambar-input" accept="image/*" class="hidden">
+                </div>
 
-            return (
-                <div className="min-h-screen flex flex-col items-center p-4 pb-12">
-                    <div className="w-full max-w-md glass-card rounded-[2.5rem] shadow-2xl overflow-hidden border border-white">
-                        <div className="p-6 bg-slate-900 text-white flex justify-between items-center">
-                            <div className="flex items-center gap-3">
-                                <div className="bg-red-500 p-2 rounded-xl shadow-lg shadow-red-500/30">
-                                    <i className="fa-solid fa-book-open text-lg"></i>
-                                </div>
-                                <div>
-                                    <h1 className="font-extrabold uppercase tracking-tight leading-none text-lg">Pelupusan</h1>
-                                    <p className="text-[10px] text-red-400 font-bold tracking-widest uppercase">OCR Buku & Fail</p>
-                                </div>
-                            </div>
-                            <a href={SHEET_URL} target="_blank" className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition-all">
-                                <i className="fa-solid fa-file-excel text-green-400"></i>
-                            </a>
-                        </div>
-
-                        <div className="p-5 space-y-5">
-                            <div className="aspect-[4/3] bg-slate-200 rounded-[2rem] overflow-hidden relative border-4 border-white shadow-inner">
-                                {isCameraOpen ? (
-                                    <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
-                                ) : image ? (
-                                    <img src={image} className="w-full h-full object-cover shadow-lg" />
-                                ) : (
-                                    <div className="h-full flex flex-col items-center justify-center text-slate-400 bg-slate-100">
-                                        <i className="fa-solid fa-camera text-5xl mb-4 opacity-20"></i>
-                                        <p className="text-[11px] font-black uppercase tracking-[0.2em]">Sedia Untuk Scan Teks</p>
-                                    </div>
-                                )}
-                                
-                                {loading && (
-                                    <div className="absolute inset-0 bg-slate-900/80 flex flex-col items-center justify-center text-white backdrop-blur-md z-50 transition-all">
-                                        <div className="loader-ring mb-4"></div>
-                                        <p className="text-[11px] font-black tracking-[0.3em] uppercase animate-pulse">
-                                            {statusMsg || "MEMBACA TEKS..."}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-
-                            <button 
-                                onClick={isCameraOpen ? takePhoto : startCamera} 
-                                className={`w-full py-6 rounded-2xl font-black tracking-widest transition-all active:scale-95 shadow-xl flex items-center justify-center gap-3 ${isCameraOpen ? 'bg-red-600 text-white shadow-red-500/20' : 'bg-slate-900 text-white'}`}
-                            >
-                                <i className={`fa-solid ${isCameraOpen ? 'fa-camera' : 'fa-power-off'}`}></i>
-                                {isCameraOpen ? 'AMBIL GAMBAR & SCAN' : 'BUKA KAMERA'}
-                            </button>
-
-                            <div className="space-y-5 pt-2">
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tajuk Buku/Fail (Hasil Scan)</label>
-                                    <textarea 
-                                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:border-red-500 outline-none transition-all shadow-inner min-h-[100px]" 
-                                        placeholder="Teks yang dikesan pada buku akan dipaparkan di sini..."
-                                        value={formData.tajuk} 
-                                        onChange={e => setFormData({...formData, tajuk: e.target.value})} 
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tahun Terbitan</label>
-                                        <input 
-                                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-center shadow-inner" 
-                                            value={formData.tahun} 
-                                            placeholder="cth: 1995"
-                                            onChange={e => setFormData({...formData, tahun: e.target.value})} 
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bilangan Naskhah</label>
-                                        <input 
-                                            type="number" 
-                                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-center shadow-inner" 
-                                            value={formData.bil} 
-                                            onChange={e => setFormData({...formData, bil: e.target.value})} 
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1.5">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ketebalan (Meter)</label>
-                                    <input 
-                                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold shadow-inner" 
-                                        placeholder="cth: 0.05" 
-                                        value={formData.meter} 
-                                        onChange={e => setFormData({...formData, meter: e.target.value})} 
-                                    />
-                                </div>
-
-                                <button 
-                                    onClick={handleSave} 
-                                    disabled={loading || !image} 
-                                    className={`w-full py-6 rounded-[2rem] font-black tracking-[0.2em] shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3 ${loading || !image ? 'bg-slate-200 text-slate-400' : 'bg-green-600 text-white hover:bg-green-700 shadow-green-500/20'}`}
-                                >
-                                    <i className="fa-solid fa-cloud-arrow-up"></i>
-                                    SIMPAN KE SHEET
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <canvas ref={canvasRef} className="hidden"></canvas>
-                    <div className="mt-8 text-center">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Sistem Pelupusan Pintar v2.4</p>
-                        <p className="text-[9px] text-slate-300 mt-1 uppercase tracking-widest">Diperkasakan oleh Gemini AI OCR</p>
+                <!-- Processing Status -->
+                <div id="status-container" class="mb-6 p-4 bg-blue-50 rounded-2xl flex items-center justify-between hidden">
+                    <div class="flex items-center space-x-3">
+                        <div class="loader" id="loading-spinner"></div>
+                        <span id="status-text" class="text-sm font-semibold text-blue-700">Mengecam teks...</span>
                     </div>
                 </div>
-            );
-        };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+                <!-- Form Fields -->
+                <div class="space-y-4">
+                    <!-- Tajuk Rekod -->
+                    <div class="space-y-2">
+                        <label for="input-tajuk" class="flex items-center space-x-2 text-sm font-bold text-slate-700 ml-1">
+                            <i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i>
+                            <span>TAJUK REKOD / BAHAN</span>
+                        </label>
+                        <input type="text" id="input-tajuk" 
+                               placeholder="Tajuk akan diisi secara imbasan..."
+                               class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl text-slate-800 font-semibold placeholder:text-slate-400 focus:border-blue-500 focus:ring-0 outline-none transition-all uppercase">
+                    </div>
+
+                    <!-- Tahun & Meter Row -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label for="input-tahun" class="flex items-center space-x-2 text-sm font-bold text-slate-700 ml-1">
+                                <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
+                                <span>TAHUN</span>
+                            </label>
+                            <input type="number" id="input-tahun" placeholder="2024"
+                                   class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl text-slate-800 font-semibold focus:border-blue-500 outline-none transition-all">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="input-meter" class="flex items-center space-x-2 text-sm font-bold text-slate-700 ml-1">
+                                <i data-lucide="gauge" class="w-4 h-4 text-blue-600"></i>
+                                <span>METER / JUMLAH</span>
+                            </label>
+                            <input type="text" id="input-meter" placeholder="Cth: 10m"
+                                   class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl text-slate-800 font-semibold focus:border-blue-500 outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Cadangan Dropdown -->
+                    <div class="space-y-2">
+                        <label for="select-cadangan" class="flex items-center space-x-2 text-sm font-bold text-slate-700 ml-1">
+                            <i data-lucide="arrow-right-circle" class="w-4 h-4 text-blue-600"></i>
+                            <span>CADANGAN TINDAKAN</span>
+                        </label>
+                        <select id="select-cadangan" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl text-slate-800 font-semibold focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                            <option value="">-- Sila Pilih --</option>
+                            <option value="MUSNAH">MUSNAH</option>
+                            <option value="KITAR SEMULA">KITAR SEMULA</option>
+                            <option value="DERMA">DERMA</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="grid grid-cols-3 gap-3 pt-4">
+                        <button onclick="resetForm()" class="btn-primary flex items-center justify-center space-x-1 bg-red-50 text-red-600 py-4 px-2 rounded-2xl font-bold hover:bg-red-100">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            <span class="text-sm">RESET</span>
+                        </button>
+                        <button onclick="copyAllData()" class="btn-primary flex items-center justify-center space-x-1 bg-slate-100 text-slate-700 py-4 px-2 rounded-2xl font-bold hover:bg-slate-200">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                            <span class="text-sm">SALIN</span>
+                        </button>
+                        <button id="btn-save" onclick="saveToSheets()" class="btn-primary flex items-center justify-center space-x-1 bg-green-600 text-white py-4 px-2 rounded-2xl font-bold hover:bg-green-700 shadow-lg shadow-green-100">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span class="text-sm">SIMPAN</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center text-slate-400 text-xs mt-8 uppercase tracking-widest font-semibold">
+            Sistem Inventori Pelupusan Digital
+        </p>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // GANTIKAN URL INI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT ANDA
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyPLnUEqJ6MrFlVf5rV3XM1R01wybd_omHwDuooaVjIO1tpE2VIieNPot2P54GubGGhkg/exec';
+
+        const video = document.getElementById('camera-preview');
+        const canvas = document.getElementById('capture-canvas');
+        const btnStart = document.getElementById('btn-start-camera');
+        const btnSnap = document.getElementById('btn-snap');
+        const cameraPlaceholder = document.getElementById('camera-placeholder');
+        const cameraOverlay = document.getElementById('camera-overlay');
+        
+        const inputGambar = document.getElementById('gambar-input');
+        const inputTajuk = document.getElementById('input-tajuk');
+        const inputTahun = document.getElementById('input-tahun');
+        const inputMeter = document.getElementById('input-meter');
+        const selectCadangan = document.getElementById('select-cadangan');
+        
+        const statusContainer = document.getElementById('status-container');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const statusText = document.getElementById('status-text');
+
+        let stream = null;
+
+        btnStart.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: { exact: "environment" } }, 
+                    audio: false 
+                }).catch(async () => {
+                    return await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: "environment" }, 
+                        audio: false 
+                    });
+                });
+
+                video.srcObject = stream;
+                btnStart.classList.add('hidden');
+                btnSnap.classList.remove('hidden');
+                cameraPlaceholder.classList.add('hidden');
+                cameraOverlay.classList.remove('hidden');
+            } catch (err) {
+                console.error("Ralat akses kamera: ", err);
+                alert("Akses kamera dinafikan atau tidak dijumpai.");
+            }
+        });
+
+        btnSnap.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            prosesOCR(dataUrl);
+            
+            if(stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            btnStart.classList.remove('hidden');
+            btnSnap.classList.add('hidden');
+            cameraPlaceholder.classList.remove('hidden');
+            cameraOverlay.classList.add('hidden');
+            video.srcObject = null;
+        });
+
+        inputGambar.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            prosesOCR(file);
+        });
+
+        function prosesOCR(source) {
+            statusContainer.classList.remove('hidden');
+            loadingSpinner.style.display = 'block';
+            statusText.innerText = "Mengecam tajuk...";
+            inputTajuk.value = "";
+
+            Tesseract.recognize(
+                source,
+                'msa+eng',
+                { 
+                    logger: m => {
+                        if(m.status === 'recognizing text') {
+                            statusText.innerText = `Memproses: ${Math.round(m.progress * 100)}%`;
+                        }
+                    } 
+                }
+            ).then(({ data: { text } }) => {
+                let cleanText = text
+                    .replace(/[^a-zA-Z0-9\s]/g, '')
+                    .replace(/\n/g, ' ')
+                    .replace(/\s\s+/g, ' ')
+                    .trim()
+                    .toUpperCase();
+
+                inputTajuk.value = cleanText || "TIADA TEKS DIKESAN";
+                loadingSpinner.style.display = 'none';
+                statusText.innerText = "Imbasan berjaya!";
+                setTimeout(() => statusContainer.classList.add('hidden'), 3000);
+            }).catch(err => {
+                console.error(err);
+                statusText.innerText = "Ralat semasa memproses.";
+                loadingSpinner.style.display = 'none';
+            });
+        }
+
+        function resetForm() {
+            inputTajuk.value = "";
+            inputTahun.value = "";
+            inputMeter.value = "";
+            selectCadangan.value = "";
+            statusContainer.classList.add('hidden');
+        }
+
+        function copyAllData() {
+            if (!inputTajuk.value) {
+                alert("Sila isi maklumat sebelum menyalin.");
+                return;
+            }
+            const formatData = `TAJUK: ${inputTajuk.value}\nTAHUN: ${inputTahun.value}\nMETER/JUMLAH: ${inputMeter.value}\nCADANGAN: ${selectCadangan.value}`;
+            const textArea = document.createElement("textarea");
+            textArea.value = formatData;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            statusContainer.classList.remove('hidden');
+            statusText.innerText = "Maklumat disalin!";
+            setTimeout(() => statusContainer.classList.add('hidden'), 2000);
+        }
+
+        async function saveToSheets() {
+            if (!inputTajuk.value) {
+                alert("Sila isi tajuk terlebih dahulu.");
+                return;
+            }
+
+            if (scriptURL === 'SILA_MASUKKAN_URL_SCRIPT_DI_SINI') {
+                alert("Sila masukkan URL Google Apps Script dalam kod terlebih dahulu.");
+                return;
+            }
+
+            const btnSave = document.getElementById('btn-save');
+            btnSave.disabled = true;
+            btnSave.innerText = "Menyimpan...";
+            
+            statusContainer.classList.remove('hidden');
+            loadingSpinner.style.display = 'block';
+            statusText.innerText = "Menghantar data ke Google Sheets...";
+
+            const formData = new FormData();
+            formData.append('TARIKH', new Date().toLocaleDateString('ms-MY'));
+            formData.append('TAJUK_REKOD_BAHAN', inputTajuk.value);
+            formData.append('TAHUN', inputTahun.value);
+            formData.append('METER_JUMLAH', inputMeter.value);
+            formData.append('CADANGAN_TINDAKAN', selectCadangan.value);
+
+            try {
+                await fetch(scriptURL, { method: 'POST', body: formData });
+                statusText.innerText = "Data berjaya disimpan!";
+                resetForm();
+            } catch (error) {
+                console.error('Ralat!', error.message);
+                statusText.innerText = "Ralat semasa menyimpan.";
+            } finally {
+                btnSave.disabled = false;
+                btnSave.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i><span class="text-sm">SIMPAN</span>`;
+                lucide.createIcons();
+                setTimeout(() => statusContainer.classList.add('hidden'), 3000);
+            }
+        }
     </script>
 </body>
 </html>
