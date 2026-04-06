@@ -172,14 +172,20 @@
                         </button>
                     </div>
 
+                    <button id="btn-save" onclick="saveToSheets()" class="btn-primary flex items-center justify-center space-x-2 bg-emerald-600 text-white py-5 px-4 rounded-2xl font-black hover:bg-emerald-700 w-full shadow-lg shadow-emerald-100">
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                        <span>Simpan Rekod</span>
+                    </button>
+
+                    <!-- Butang Preview Data -->
+                    <button onclick="previewData()" class="btn-primary flex items-center justify-center space-x-2 bg-amber-500 text-white py-5 px-4 rounded-2xl font-black hover:bg-amber-600 w-full shadow-lg shadow-amber-100 uppercase tracking-tight">
+                        <i data-lucide="eye" class="w-5 h-5"></i>
+                        <span>Preview Data</span>
+                    </button>
+
                     <button onclick="openArkib2()" class="btn-primary flex items-center justify-center space-x-2 bg-indigo-600 text-white py-5 px-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all uppercase tracking-tight w-full">
                         <i data-lucide="archive" class="w-5 h-5"></i>
                         <span>ARKIB 2</span>
-                    </button>
-
-                    <button id="btn-save" onclick="saveToSheets()" class="btn-primary flex items-center justify-center space-x-2 bg-emerald-600 text-white py-5 px-4 rounded-2xl font-black hover:bg-emerald-700 w-full">
-                        <i data-lucide="send" class="w-5 h-5"></i>
-                        <span>Simpan Rekod</span>
                     </button>
                 </div>
             </div>
@@ -215,10 +221,18 @@
             </div>
 
             <div class="p-6 md:p-8 space-y-6">
-                <button id="btn-arkib-camera-trigger" class="btn-primary w-full flex items-center justify-center space-x-2 bg-slate-900 text-white py-5 rounded-2xl font-black">
-                    <i data-lucide="camera" class="w-5 h-5"></i>
-                    <span>BUKA KAMERA ARKIB</span>
-                </button>
+                <!-- Update Butang Kamera & Muat Naik untuk Arkib 2 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <button id="btn-arkib-camera-trigger" class="btn-primary w-full flex items-center justify-center space-x-2 bg-slate-900 text-white py-5 rounded-2xl font-black">
+                        <i data-lucide="camera" class="w-5 h-5"></i>
+                        <span>BUKA KAMERA ARKIB</span>
+                    </button>
+                    <label for="arkib-gambar-input" class="btn-primary cursor-pointer flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-5 px-6 rounded-2xl font-black hover:bg-slate-200 w-full uppercase">
+                        <i data-lucide="upload" class="w-5 h-5"></i>
+                        <span>Muat Naik Fail</span>
+                    </label>
+                    <input type="file" id="arkib-gambar-input" accept="image/*" class="hidden">
+                </div>
 
                 <div class="grid grid-cols-1 gap-6">
                     <!-- Bilangan -->
@@ -279,6 +293,12 @@
                 <button onclick="saveArkib2()" class="btn-primary w-full bg-indigo-600 text-white py-5 rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-all uppercase">
                     SIMPAN REKOD ARKIB 2
                 </button>
+
+                <!-- Butang Preview Data untuk Arkib 2 -->
+                <button onclick="previewData()" class="btn-primary flex items-center justify-center space-x-2 bg-amber-500 text-white py-5 px-4 rounded-2xl font-black hover:bg-amber-600 w-full shadow-lg shadow-amber-100 uppercase tracking-tight">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                    <span>Preview Data</span>
+                </button>
             </div>
         </div>
         <p class="text-center text-slate-400 text-[10px] mt-10 uppercase tracking-[0.2em] font-black opacity-30">Pemusnahan Rekod Awam Form Section</p>
@@ -287,12 +307,11 @@
     <script>
         lucide.createIcons();
 
-        // --- KONFIGURASI URL WEB APPS ---
-        // Sila masukkan URL Web App Google Sheets untuk Kamera Pertama (Sheet BUKU)
-        const URL_WEB_APP_REKOD = 'https://script.google.com/macros/s/AKfycbzxVig-orilvkatP9wl3plYbFjJARz3BZg2rOQfj41IK7JKdaB6_2rEhNM53F-0xO8N7Q/exec';
+        // --- KONFIGURASI URL WEB APPS & SHEETS ---
+        const URL_WEB_APP_REKOD = 'https://script.google.com/macros/s/AKfycbzYIDjZaMa0R-AqD27O4dMN8LDUTiYR-t2T-HjaL4oVmjQspzbaJ3VizU7GxHjAQxW5Yg/exec';
+        const URL_WEB_APP_ARKIB2 = 'https://script.google.com/macros/s/AKfycbzYIDjZaMa0R-AqD27O4dMN8LDUTiYR-t2T-HjaL4oVmjQspzbaJ3VizU7GxHjAQxW5Yg/exec';
         
-        // Sila masukkan URL Web App Google Sheets untuk ARKIB 2
-        const URL_WEB_APP_ARKIB2 = 'https://script.google.com/macros/s/AKfycbyX1Ut5y1UPWbKFqvW_Rv6Jo_lMntglHp5PkHzw5lBF_TKyAMWfMKsCJ_fULSa8288myw/exec';
+        const URL_GOOGLE_SHEETS_VIEW = 'https://docs.google.com/spreadsheets/d/1Xl2N9758X7Yv1FqXnZ18pZ5-2N5oMsh6vM_JpL4Zt3Y/edit';
 
         // Views
         const mainView = document.getElementById('main-view');
@@ -307,15 +326,22 @@
         const cameraOverlay = document.getElementById('camera-overlay');
         const statusContainer = document.getElementById('status-container');
         const statusText = document.getElementById('status-text');
+        const fileInputMain = document.getElementById('gambar-input');
 
         // Arkib Elements
         const arkibVideo = document.getElementById('arkib-video');
         const btnArkibCameraTrigger = document.getElementById('btn-arkib-camera-trigger');
         const btnArkibSnap = document.getElementById('btn-arkib-snap');
         const arkibPlaceholder = document.getElementById('arkib-camera-placeholder');
+        const fileInputArkib = document.getElementById('arkib-gambar-input');
 
         let stream = null;
         let arkibStream = null;
+
+        // --- FUNGSI PREVIEW ---
+        function previewData() {
+            window.open(URL_GOOGLE_SHEETS_VIEW, '_blank');
+        }
 
         // --- CAMERA MAIN ---
         btnStart.addEventListener('click', async () => {
@@ -345,6 +371,25 @@
             cameraOverlay.classList.add('hidden');
             video.srcObject = null;
         }
+
+        // --- UPLOAD HANDLERS ---
+        fileInputMain.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => prosesOCR(event.target.result);
+                reader.readAsDataURL(file);
+            }
+        });
+
+        fileInputArkib.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => prosesOCRArkib(event.target.result);
+                reader.readAsDataURL(file);
+            }
+        });
 
         // --- NAVIGATION ---
         function openArkib2() {
@@ -420,6 +465,7 @@
             document.getElementById('input-tahun').value = "";
             document.getElementById('input-meter').value = "";
             document.getElementById('select-cadangan').value = "";
+            fileInputMain.value = "";
         }
 
         function copyAllData() {
@@ -439,6 +485,7 @@
             document.getElementById('arkib-tempoh').value = "";
             document.getElementById('arkib-unit').value = "";
             document.getElementById('arkib-meter').value = "";
+            fileInputArkib.value = "";
         }
 
         function copyArkibData() {
@@ -453,7 +500,6 @@
         }
 
         // --- FUNGSI SIMPAN DATA KE GOOGLE SHEETS ---
-
         function saveArkib2() {
             const bil = document.getElementById('arkib-bil').value;
             const tajuk = document.getElementById('arkib-tajuk-siri').value;
@@ -468,7 +514,6 @@
             statusContainer.classList.remove('hidden');
             statusText.innerText = "Menyimpan ke Arkib 2...";
 
-            // Menyediakan data untuk dihantar (menggunakan format JSON/Query String bergantung kepada Apps Script anda)
             const params = new URLSearchParams({
                 action: 'saveArkib2',
                 bil: bil,
@@ -482,7 +527,7 @@
 
             fetch(URL_WEB_APP_ARKIB2, {
                 method: 'POST',
-                mode: 'no-cors', // Penting untuk Apps Script jika tiada CORS header
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params
             })
