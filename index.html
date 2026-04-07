@@ -84,7 +84,6 @@
             </div>
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight px-2 uppercase">KAMERA PELUPUSAN PINTAR</h1>
             <p class="text-slate-500 mt-2 font-medium text-sm md:text-base">Sistem Pengurusan Rekod & Pelupusan</p>
-             <p class="text-slate-500 mt-2 font-medium text-sm md:text-base">ARKIB 9</p>
         </div>
 
         <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 overflow-hidden border border-slate-100 glass-effect">
@@ -104,15 +103,15 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
                     <button id="btn-start-camera" class="btn-primary flex items-center justify-center space-x-2 bg-slate-900 text-white py-4 px-6 rounded-2xl font-bold hover:bg-slate-800 shadow-lg w-full">
                         <i data-lucide="video" class="w-5 h-5"></i>
-                        <span>BUKA KAMERA</span>
+                        <span>Buka Kamera</span>
                     </button>
                     <button id="btn-snap" class="btn-primary flex items-center justify-center space-x-2 bg-blue-600 text-white py-4 px-6 rounded-2xl font-bold hover:bg-blue-700 shadow-xl hidden w-full">
                         <i data-lucide="aperture" class="w-5 h-5"></i>
-                        <span>AMBIL GAMBAR</span>
+                        <span>Ambil Gambar</span>
                     </button>
                     <label for="gambar-input" class="btn-primary cursor-pointer flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-4 px-6 rounded-2xl font-bold hover:bg-slate-200 w-full">
                         <i data-lucide="upload" class="w-5 h-5"></i>
-                        <span>MUAT NAIK FAIL</span>
+                        <span>Muat Naik Fail</span>
                     </label>
                     <input type="file" id="gambar-input" accept="image/*" class="hidden">
                 </div>
@@ -175,7 +174,7 @@
 
                     <button id="btn-save" onclick="saveToSheets()" class="btn-primary flex items-center justify-center space-x-2 bg-emerald-600 text-white py-5 px-4 rounded-2xl font-black hover:bg-emerald-700 w-full shadow-lg shadow-emerald-100">
                         <i data-lucide="send" class="w-5 h-5"></i>
-                        <span>SIMPAN REKOD</span>
+                        <span>Simpan Rekod</span>
                     </button>
 
                     <!-- Butang Preview Data -->
@@ -222,11 +221,11 @@
             </div>
 
             <div class="p-6 md:p-8 space-y-6">
-                <!-- Update Butang Kamera & Muat Naik untuk Arkib 2 -->
+                <!-- Butang Kamera & Muat Naik untuk Arkib 2 -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                     <button id="btn-arkib-camera-trigger" class="btn-primary w-full flex items-center justify-center space-x-2 bg-slate-900 text-white py-5 rounded-2xl font-black">
                         <i data-lucide="camera" class="w-5 h-5"></i>
-                        <span>BUKA KAMERA</span>
+                        <span>BUKA KAMERA ARKIB</span>
                     </button>
                     <label for="arkib-gambar-input" class="btn-primary cursor-pointer flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-5 px-6 rounded-2xl font-black hover:bg-slate-200 w-full uppercase">
                         <i data-lucide="upload" class="w-5 h-5"></i>
@@ -279,7 +278,7 @@
                     </div>
                 </div>
 
-                <!-- NEW ACTION BUTTONS FOR ARKIB 2 -->
+                <!-- ACTION BUTTONS FOR ARKIB 2 -->
                 <div class="grid grid-cols-2 gap-3 pt-4">
                     <button onclick="resetArkibForm()" class="btn-primary flex items-center justify-center space-x-2 bg-rose-50 text-rose-600 py-5 px-4 rounded-2xl font-black uppercase tracking-tight">
                         <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
@@ -292,7 +291,7 @@
                 </div>
 
                 <button onclick="saveArkib2()" class="btn-primary w-full bg-indigo-600 text-white py-5 rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-all uppercase">
-                    SIMPAN REKOD
+                    SIMPAN REKOD ARKIB 2
                 </button>
 
                 <!-- Butang Preview Data untuk Arkib 2 -->
@@ -311,7 +310,6 @@
         // --- KONFIGURASI URL WEB APPS & SHEETS ---
         const URL_WEB_APP_REKOD = 'https://script.google.com/macros/s/AKfycbzYIDjZaMa0R-AqD27O4dMN8LDUTiYR-t2T-HjaL4oVmjQspzbaJ3VizU7GxHjAQxW5Yg/exec';
         const URL_WEB_APP_ARKIB2 = 'https://script.google.com/macros/s/AKfycbzYIDjZaMa0R-AqD27O4dMN8LDUTiYR-t2T-HjaL4oVmjQspzbaJ3VizU7GxHjAQxW5Yg/exec';
-        
         const URL_GOOGLE_SHEETS_VIEW = 'https://docs.google.com/spreadsheets/d/1Xl2N9758X7Yv1FqXnZ18pZ5-2N5oMsh6vM_JpL4Zt3Y/edit';
 
         // Views
@@ -434,27 +432,65 @@
             btnArkibCameraTrigger.classList.remove('opacity-50', 'pointer-events-none');
         }
 
-        // --- OCR ---
+        // --- OCR HELPERS ---
+        function extractMeterValue(text) {
+            // Cuba cari corak nombor perpuluhan atau nombor yang diikuti dengan M/METER
+            // Contoh: "0.1", "0.5", "1.2 METER", "2M"
+            const meterPattern = /(\d+(\.\d+)?)\s*(M|METER|METRE)?\b/i;
+            const match = text.match(meterPattern);
+            return match ? match[1] : null;
+        }
+
+        // --- OCR MAIN ---
         function prosesOCR(source) {
             statusContainer.classList.remove('hidden');
             statusText.innerText = "Mengecam teks...";
             Tesseract.recognize(source, 'msa+eng').then(({ data: { text } }) => {
-                document.getElementById('input-tajuk').value = text.replace(/\n/g, ' ').substring(0, 150).toUpperCase().trim();
+                const cleanedText = text.replace(/\n/g, ' ').toUpperCase().trim();
+                
+                // Set Tajuk
+                document.getElementById('input-tajuk').value = cleanedText.substring(0, 150);
+                
+                // Auto Masuk Meter/Jumlah (Jika ada corak nombor)
+                const meterVal = extractMeterValue(cleanedText);
+                if(meterVal) {
+                    document.getElementById('input-meter').value = meterVal;
+                }
+
+                // Cari Tahun
+                const years = cleanedText.match(/\b(19|20)\d{2}\b/g);
+                if(years && years[0]) {
+                    document.getElementById('input-tahun').value = years[0];
+                }
+
                 statusText.innerText = "Selesai!";
                 setTimeout(() => statusContainer.classList.add('hidden'), 2000);
             });
         }
 
+        // --- OCR ARKIB 2 ---
         function prosesOCRArkib(source) {
             statusContainer.classList.remove('hidden');
             statusText.innerText = "Mengecam borang...";
             Tesseract.recognize(source, 'msa+eng').then(({ data: { text } }) => {
-                document.getElementById('arkib-tajuk-siri').value = text.substring(0, 100).toUpperCase().trim();
-                const years = text.match(/\b(19|20)\d{2}\b/g);
+                const cleanedText = text.replace(/\n/g, ' ').toUpperCase().trim();
+                
+                // Set Tajuk Siri
+                document.getElementById('arkib-tajuk-siri').value = cleanedText.substring(0, 100);
+                
+                // Auto Masuk Meter Panjang (Jika ada corak nombor)
+                const meterVal = extractMeterValue(cleanedText);
+                if(meterVal) {
+                    document.getElementById('arkib-meter').value = meterVal;
+                }
+
+                // Cari Tahun
+                const years = cleanedText.match(/\b(19|20)\d{2}\b/g);
                 if(years) {
                     if(years[0]) document.getElementById('arkib-tahun-dari').value = years[0];
                     if(years[1]) document.getElementById('arkib-tahun-ke').value = years[1];
                 }
+
                 statusText.innerText = "Data Arkib Dikemaskini!";
                 setTimeout(() => statusContainer.classList.add('hidden'), 2000);
             });
@@ -500,7 +536,7 @@
             alert("Data Arkib 2 Disalin!");
         }
 
-        // --- FUNGSI SIMPAN DATA KE GOOGLE SHEETS ---
+        // --- SIMPAN DATA ---
         function saveArkib2() {
             const bil = document.getElementById('arkib-bil').value;
             const tajuk = document.getElementById('arkib-tajuk-siri').value;
