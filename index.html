@@ -434,8 +434,7 @@
 
         // --- OCR HELPERS ---
         function extractMeterValue(text) {
-            // Cuba cari corak nombor perpuluhan atau nombor yang diikuti dengan M/METER
-            // Contoh: "0.1", "0.5", "1.2 METER", "2M"
+            // Mengesan corak nombor seperti 0.1, 1.5, dsb
             const meterPattern = /(\d+(\.\d+)?)\s*(M|METER|METRE)?\b/i;
             const match = text.match(meterPattern);
             return match ? match[1] : null;
@@ -451,7 +450,7 @@
                 // Set Tajuk
                 document.getElementById('input-tajuk').value = cleanedText.substring(0, 150);
                 
-                // Auto Masuk Meter/Jumlah (Jika ada corak nombor)
+                // Auto Masuk Meter/Jumlah
                 const meterVal = extractMeterValue(cleanedText);
                 if(meterVal) {
                     document.getElementById('input-meter').value = meterVal;
@@ -475,23 +474,27 @@
             Tesseract.recognize(source, 'msa+eng').then(({ data: { text } }) => {
                 const cleanedText = text.replace(/\n/g, ' ').toUpperCase().trim();
                 
-                // Set Tajuk Siri
-                document.getElementById('arkib-tajuk-siri').value = cleanedText.substring(0, 100);
+                // 1. Masukkan Tajuk Siri (6) - Ambil teks yang dikesan
+                const tajukInput = document.getElementById('arkib-tajuk-siri');
+                if (cleanedText.length > 0) {
+                    tajukInput.value = cleanedText.substring(0, 200);
+                }
                 
-                // Auto Masuk Meter Panjang (Jika ada corak nombor)
+                // 2. Masukkan Meter Panjang (10) - Cari corak ukuran/nombor
+                const meterInput = document.getElementById('arkib-meter');
                 const meterVal = extractMeterValue(cleanedText);
                 if(meterVal) {
-                    document.getElementById('arkib-meter').value = meterVal;
+                    meterInput.value = meterVal;
                 }
 
-                // Cari Tahun
+                // 3. Cari Tahun Dari/Ke
                 const years = cleanedText.match(/\b(19|20)\d{2}\b/g);
                 if(years) {
                     if(years[0]) document.getElementById('arkib-tahun-dari').value = years[0];
                     if(years[1]) document.getElementById('arkib-tahun-ke').value = years[1];
                 }
 
-                statusText.innerText = "Data Arkib Dikemaskini!";
+                statusText.innerText = "Data Arkib Diterima!";
                 setTimeout(() => statusContainer.classList.add('hidden'), 2000);
             });
         }
