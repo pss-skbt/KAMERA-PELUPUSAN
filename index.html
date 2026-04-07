@@ -124,15 +124,15 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
                     <button id="btn-start-camera" class="btn-primary flex items-center justify-center space-x-2 bg-slate-900 text-white py-4 px-6 rounded-2xl font-bold hover:bg-slate-800 shadow-lg w-full">
                         <i data-lucide="video" class="w-5 h-5"></i>
-                        <span>Buka Kamera</span>
+                        <span>BUKA KAMERA</span>
                     </button>
                     <button id="btn-snap" class="btn-primary flex items-center justify-center space-x-2 bg-blue-600 text-white py-4 px-6 rounded-2xl font-bold hover:bg-blue-700 shadow-xl hidden w-full">
                         <i data-lucide="aperture" class="w-5 h-5"></i>
-                        <span>Ambil Gambar</span>
+                        <span>Ambil gambar</span>
                     </button>
                     <label for="gambar-input" class="btn-primary cursor-pointer flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-4 px-6 rounded-2xl font-bold hover:bg-slate-200 w-full">
                         <i data-lucide="upload" class="w-5 h-5"></i>
-                        <span>Muat Naik Fail</span>
+                        <span>MUAT NAIK FAIL</span>
                     </label>
                     <input type="file" id="gambar-input" accept="image/*" class="hidden">
                 </div>
@@ -179,23 +179,25 @@
                             <option value="">Sila Pilih</option>
                             <option value="MUSNAH">MUSNAH</option>
                             <option value="KITAR SEMULA">KITAR SEMULA</option>
+                            <option value="DERMA/SUMBANGAN">KITAR SEMULA</option>
+                            <option value="JUALAN/LELONGAN">KITAR SEMULA</option>
                         </select>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 pt-4">
                         <button onclick="resetForm()" class="btn-primary flex items-center justify-center space-x-2 bg-rose-50 text-rose-600 py-5 px-4 rounded-2xl font-black uppercase tracking-tight">
                             <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
-                            <span>Mula Semula</span>
+                            <span>MULA SEMULA</span>
                         </button>
                         <button onclick="copyAllData()" class="btn-primary flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-5 px-4 rounded-2xl font-black uppercase tracking-tight">
                             <i data-lucide="clipboard" class="w-5 h-5"></i>
-                            <span>Salin Teks</span>
+                            <span>SALIN TEKS</span>
                         </button>
                     </div>
 
                     <button id="btn-save" onclick="saveToSheets()" class="btn-primary flex items-center justify-center space-x-2 bg-emerald-600 text-white py-5 px-4 rounded-2xl font-black hover:bg-emerald-700 w-full shadow-lg shadow-emerald-100">
                         <i data-lucide="send" class="w-5 h-5"></i>
-                        <span>Simpan Rekod</span>
+                        <span>SIMPAN REKOD</span>
                     </button>
 
                     <!-- Butang Preview Data Utama -->
@@ -206,7 +208,7 @@
 
                     <button onclick="openArkib2()" class="btn-primary flex items-center justify-center space-x-2 bg-indigo-600 text-white py-5 px-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all uppercase tracking-tight w-full">
                         <i data-lucide="archive" class="w-5 h-5"></i>
-                        <span>ARKIB 2</span>
+                        <span>ARKIB 2/08</span>
                     </button>
                 </div>
             </div>
@@ -253,7 +255,7 @@
                     </button>
                     <label for="arkib-gambar-input" class="btn-primary cursor-pointer flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-5 px-6 rounded-2xl font-black hover:bg-slate-200 w-full uppercase">
                         <i data-lucide="upload" class="w-5 h-5"></i>
-                        <span>Muat Naik Fail</span>
+                        <span>MuAT NAIK FAIL</span>
                     </label>
                     <input type="file" id="arkib-gambar-input" accept="image/*" class="hidden">
                 </div>
@@ -296,22 +298,22 @@
                 <div class="grid grid-cols-2 gap-3 pt-4">
                     <button onclick="resetArkibForm()" class="btn-primary flex items-center justify-center space-x-2 bg-rose-50 text-rose-600 py-5 px-4 rounded-2xl font-black uppercase tracking-tight">
                         <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
-                        <span>Mula Semula</span>
+                        <span>MULA SEMULA</span>
                     </button>
                     <button onclick="copyArkibData()" class="btn-primary flex items-center justify-center space-x-2 bg-slate-100 text-slate-700 py-5 px-4 rounded-2xl font-black uppercase tracking-tight">
                         <i data-lucide="clipboard" class="w-5 h-5"></i>
-                        <span>Salin Teks</span>
+                        <span>SALIN TEKS</span>
                     </button>
                 </div>
 
                 <button onclick="saveArkib2()" class="btn-primary w-full bg-indigo-600 text-white py-5 rounded-2xl font-black shadow-lg hover:bg-indigo-700 transition-all uppercase">
-                    SIMPAN REKOD ARKIB 2
+                    SIMPAN REKOD
                 </button>
 
                 <!-- Butang Preview Data Khusus Arkib 2 -->
                 <button onclick="previewDataArkib()" class="btn-primary flex items-center justify-center space-x-2 bg-amber-500 text-white py-5 px-4 rounded-2xl font-black hover:bg-amber-600 w-full shadow-lg shadow-amber-100 uppercase tracking-tight">
                     <i data-lucide="eye" class="w-5 h-5"></i>
-                    <span>Preview Data DI ARKIB 2</span>
+                    <span>PREVIEW DATA</span>
                 </button>
             </div>
         </div>
