@@ -177,10 +177,10 @@
                         <span>Simpan Rekod</span>
                     </button>
 
-                    <!-- Butang Preview Data -->
-                    <button onclick="previewData()" class="btn-primary flex items-center justify-center space-x-2 bg-amber-500 text-white py-5 px-4 rounded-2xl font-black hover:bg-amber-600 w-full shadow-lg shadow-amber-100 uppercase tracking-tight">
+                    <!-- Butang Preview Data Utama -->
+                    <button onclick="previewDataRekod()" class="btn-primary flex items-center justify-center space-x-2 bg-amber-500 text-white py-5 px-4 rounded-2xl font-black hover:bg-amber-600 w-full shadow-lg shadow-amber-100 uppercase tracking-tight">
                         <i data-lucide="eye" class="w-5 h-5"></i>
-                        <span>Preview Data</span>
+                        <span>PREVIEW DATA</span>
                     </button>
 
                     <button onclick="openArkib2()" class="btn-primary flex items-center justify-center space-x-2 bg-indigo-600 text-white py-5 px-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all uppercase tracking-tight w-full">
@@ -206,7 +206,7 @@
 
         <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 overflow-hidden border border-slate-100">
             
-            <!-- Bigger Camera for Arkib 2 -->
+            <!-- Camera for Arkib 2 -->
             <div id="arkib-camera-container" class="bg-slate-900 relative aspect-[4/3] flex items-center justify-center">
                  <video id="arkib-video" autoplay playsinline class="w-full h-full object-cover hidden"></video>
                  <div id="arkib-camera-placeholder" class="text-slate-600 flex flex-col items-center p-10 text-center">
@@ -235,19 +235,14 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-6">
-                    <!-- Bilangan -->
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-[0.2em]">BILANGAN (5)</label>
                         <input type="number" id="arkib-bil" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl font-bold outline-none focus:border-indigo-500">
                     </div>
-
-                    <!-- Tajuk Siri -->
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-[0.2em]">TAJUK SIRI (6)</label>
                         <textarea id="arkib-tajuk-siri" rows="3" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl font-bold outline-none focus:border-indigo-500 uppercase" placeholder="Masukkan tajuk siri rekod..."></textarea>
                     </div>
-
-                    <!-- Tahun Diliputi -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-[0.2em]">TAHUN DARI (7)</label>
@@ -258,14 +253,10 @@
                             <input type="number" id="arkib-tahun-ke" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl font-bold outline-none focus:border-indigo-500">
                         </div>
                     </div>
-
-                    <!-- Tempoh Pengekalan -->
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-[0.2em]">TEMPOH PENGEKALAN (8)</label>
                         <input type="text" id="arkib-tempoh" class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-2xl font-bold outline-none focus:border-indigo-500 uppercase">
                     </div>
-
-                    <!-- Unit Rekod & Meter -->
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 mb-2 uppercase tracking-[0.2em]">UNIT REKOD (9)</label>
@@ -278,7 +269,6 @@
                     </div>
                 </div>
 
-                <!-- ACTION BUTTONS FOR ARKIB 2 -->
                 <div class="grid grid-cols-2 gap-3 pt-4">
                     <button onclick="resetArkibForm()" class="btn-primary flex items-center justify-center space-x-2 bg-rose-50 text-rose-600 py-5 px-4 rounded-2xl font-black uppercase tracking-tight">
                         <i data-lucide="refresh-ccw" class="w-5 h-5"></i>
@@ -294,10 +284,10 @@
                     SIMPAN REKOD ARKIB 2
                 </button>
 
-                <!-- Butang Preview Data untuk Arkib 2 -->
-                <button onclick="previewData()" class="btn-primary flex items-center justify-center space-x-2 bg-amber-500 text-white py-5 px-4 rounded-2xl font-black hover:bg-amber-600 w-full shadow-lg shadow-amber-100 uppercase tracking-tight">
+                <!-- Butang Preview Data Khusus Arkib 2 -->
+                <button onclick="previewDataArkib()" class="btn-primary flex items-center justify-center space-x-2 bg-amber-500 text-white py-5 px-4 rounded-2xl font-black hover:bg-amber-600 w-full shadow-lg shadow-amber-100 uppercase tracking-tight">
                     <i data-lucide="eye" class="w-5 h-5"></i>
-                    <span>Preview Data</span>
+                    <span>Preview Data DI ARKIB 2</span>
                 </button>
             </div>
         </div>
@@ -310,7 +300,10 @@
         // --- KONFIGURASI URL WEB APPS & SHEETS ---
         const URL_WEB_APP_REKOD = 'https://script.google.com/macros/s/AKfycbzYIDjZaMa0R-AqD27O4dMN8LDUTiYR-t2T-HjaL4oVmjQspzbaJ3VizU7GxHjAQxW5Yg/exec';
         const URL_WEB_APP_ARKIB2 = 'https://script.google.com/macros/s/AKfycbzYIDjZaMa0R-AqD27O4dMN8LDUTiYR-t2T-HjaL4oVmjQspzbaJ3VizU7GxHjAQxW5Yg/exec';
-        const URL_GOOGLE_SHEETS_VIEW = 'https://docs.google.com/spreadsheets/d/1Xl2N9758X7Yv1FqXnZ18pZ5-2N5oMsh6vM_JpL4Zt3Y/edit';
+        
+        // 2 Alamat Pautan Google Sheets yang berbeza
+        const URL_SHEETS_REKOD = 'https://docs.google.com/spreadsheets/d/1_CX7jDm7xl-YGGpyZpZnfPfYBKoU_-TRJtDaFOg4fsI/edit?usp=sharing'; // Contoh pautan 1 (Rekod Utama)
+        const URL_SHEETS_ARKIB = 'https://docs.google.com/spreadsheets/d/1sdLxpfb1ZOo7STPwu-yTzx4wozmMFgONUb2XqkuYvBI/edit?usp=sharing'; // Sila masukkan pautan 2 (Arkib 2)
 
         // Views
         const mainView = document.getElementById('main-view');
@@ -337,9 +330,13 @@
         let stream = null;
         let arkibStream = null;
 
-        // --- FUNGSI PREVIEW ---
-        function previewData() {
-            window.open(URL_GOOGLE_SHEETS_VIEW, '_blank');
+        // --- FUNGSI PREVIEW BERBEZA ---
+        function previewDataRekod() {
+            window.open(URL_SHEETS_REKOD, '_blank');
+        }
+
+        function previewDataArkib() {
+            window.open(URL_SHEETS_ARKIB, '_blank');
         }
 
         // --- CAMERA MAIN ---
@@ -434,7 +431,6 @@
 
         // --- OCR HELPERS ---
         function extractMeterValue(text) {
-            // Mengesan corak nombor seperti 0.1, 1.5, dsb
             const meterPattern = /(\d+(\.\d+)?)\s*(M|METER|METRE)?\b/i;
             const match = text.match(meterPattern);
             return match ? match[1] : null;
@@ -446,22 +442,15 @@
             statusText.innerText = "Mengecam teks...";
             Tesseract.recognize(source, 'msa+eng').then(({ data: { text } }) => {
                 const cleanedText = text.replace(/\n/g, ' ').toUpperCase().trim();
-                
-                // Set Tajuk
                 document.getElementById('input-tajuk').value = cleanedText.substring(0, 150);
-                
-                // Auto Masuk Meter/Jumlah
                 const meterVal = extractMeterValue(cleanedText);
                 if(meterVal) {
                     document.getElementById('input-meter').value = meterVal;
                 }
-
-                // Cari Tahun
                 const years = cleanedText.match(/\b(19|20)\d{2}\b/g);
                 if(years && years[0]) {
                     document.getElementById('input-tahun').value = years[0];
                 }
-
                 statusText.innerText = "Selesai!";
                 setTimeout(() => statusContainer.classList.add('hidden'), 2000);
             });
@@ -473,27 +462,20 @@
             statusText.innerText = "Mengecam borang...";
             Tesseract.recognize(source, 'msa+eng').then(({ data: { text } }) => {
                 const cleanedText = text.replace(/\n/g, ' ').toUpperCase().trim();
-                
-                // 1. Masukkan Tajuk Siri (6) - Ambil teks yang dikesan
                 const tajukInput = document.getElementById('arkib-tajuk-siri');
                 if (cleanedText.length > 0) {
                     tajukInput.value = cleanedText.substring(0, 200);
                 }
-                
-                // 2. Masukkan Meter Panjang (10) - Cari corak ukuran/nombor
                 const meterInput = document.getElementById('arkib-meter');
                 const meterVal = extractMeterValue(cleanedText);
                 if(meterVal) {
                     meterInput.value = meterVal;
                 }
-
-                // 3. Cari Tahun Dari/Ke
                 const years = cleanedText.match(/\b(19|20)\d{2}\b/g);
                 if(years) {
                     if(years[0]) document.getElementById('arkib-tahun-dari').value = years[0];
                     if(years[1]) document.getElementById('arkib-tahun-ke').value = years[1];
                 }
-
                 statusText.innerText = "Data Arkib Diterima!";
                 setTimeout(() => statusContainer.classList.add('hidden'), 2000);
             });
