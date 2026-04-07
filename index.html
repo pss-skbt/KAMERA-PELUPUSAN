@@ -298,8 +298,8 @@
         lucide.createIcons();
 
         // --- KONFIGURASI URL WEB APPS & SHEETS ---
-        // Sila pastikan URL Web App ini adalah URL yang paling baru selepas anda Deploy GAS
-        const URL_WEB_APP = 'https://script.google.com/macros/s/AKfycbz2lZHMyNvSLiVlTbD9hib78y0T4OSLU7weY8tdagNRhGaZ_7yvt3NSgSJcSwCDTXvk1A/exec';
+        const URL_WEB_APP_REKOD = 'https://script.google.com/macros/s/AKfycbzYIDjZaMa0R-AqD27O4dMN8LDUTiYR-t2T-HjaL4oVmjQspzbaJ3VizU7GxHjAQxW5Yg/exec';
+        const URL_WEB_APP_ARKIB2 = 'https://script.google.com/macros/s/AKfycby6nhwpjU77AzARYWcMl1fr5JuionmlmMnoBnmCaks9lxTiAxwhM4W3oUNy49mf8a-eKQ/exec'; // Masukkan URL Web App untuk Arkib 2 di sini
         
         const URL_SHEETS_REKOD = 'https://docs.google.com/spreadsheets/d/1_CX7jDm7xl-YGGpyZpZnfPfYBKoU_-TRJtDaFOg4fsI/edit?usp=sharing'; 
         const URL_SHEETS_ARKIB = 'https://docs.google.com/spreadsheets/d/1sdLxpfb1ZOo7STPwu-yTzx4wozmMFgONUb2XqkuYvBI/edit?usp=sharing'; 
@@ -520,8 +520,7 @@
             alert("Data Arkib 2 Disalin!");
         }
 
-        // --- SIMPAN DATA (MENYAMBUNG KE GAS) ---
-        
+        // --- SIMPAN DATA (REKOD UTAMA) ---
         async function saveToSheets() {
             const tajuk = document.getElementById('input-tajuk').value;
             const tahun = document.getElementById('input-tahun').value;
@@ -533,10 +532,8 @@
             statusContainer.classList.remove('hidden');
             statusText.innerText = "Menyimpan ke Rekod...";
 
-            // Menyediakan Tarikh Hari Ini
             const today = new Date().toLocaleDateString('ms-MY');
 
-            // Parameter mestilah sepadan dengan logik mapping dalam code.gs
             const params = new URLSearchParams({
                 'TARIKH': today,
                 'TAJUK_REKOD_BAHAN': tajuk,
@@ -545,27 +542,68 @@
                 'CADANGAN_TINDAKAN': cadangan
             });
 
-            fetch(URL_WEB_APP, {
+            fetch(URL_WEB_APP_REKOD, {
                 method: 'POST',
-                mode: 'no-cors', // Penting untuk Web App GAS
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params
             })
             .then(() => {
-                alert("Rekod Berjaya Dihantar!");
+                alert("Rekod Utama Berjaya Dihantar!");
                 statusContainer.classList.add('hidden');
                 resetForm();
             })
             .catch(err => {
-                alert("Ralat penghantaran: " + err.message);
+                alert("Ralat penghantaran Rekod Utama: " + err.message);
                 statusContainer.classList.add('hidden');
             });
         }
 
-        // Fungsi saveArkib2 boleh dilaraskan jika anda mempunyai Sheet/Script kedua
-        function saveArkib2() {
-            // Logik penghantaran yang sama seperti saveToSheets jika menggunakan satu GAS yang sama
-            alert("Fungsi Arkib 2 bersedia untuk dihubungkan mengikut keperluan spesifik anda.");
+        // --- SIMPAN DATA (ARKIB 2) ---
+        async function saveArkib2() {
+            const bil = document.getElementById('arkib-bil').value;
+            const tajukSiri = document.getElementById('arkib-tajuk-siri').value;
+            const tahunDari = document.getElementById('arkib-tahun-dari').value;
+            const tahunKe = document.getElementById('arkib-tahun-ke').value;
+            const tempoh = document.getElementById('arkib-tempoh').value;
+            const unit = document.getElementById('arkib-unit').value;
+            const meter = document.getElementById('arkib-meter').value;
+
+            if(!tajukSiri) { alert("Tajuk Siri Arkib tidak boleh kosong."); return; }
+            if(URL_WEB_APP_ARKIB2 === 'SIlA_GANTI_DENGAN_URL_WEB_APP_ARKIB2_ANDA') {
+                alert("Sila masukkan URL Web App Arkib 2 dalam kod terlebih dahulu.");
+                return;
+            }
+
+            statusContainer.classList.remove('hidden');
+            statusText.innerText = "Menyimpan ke Arkib 2...";
+
+            // Payload mengikut susunan dalam skrip GAS Arkib 2
+            const payload = {
+                bil: bil,
+                tajukSiri: tajukSiri,
+                tahunDari: tahunDari,
+                tahunKe: tahunKe,
+                tempohPengekalan: tempoh,
+                unitRekod: unit,
+                meterPanjang: meter
+            };
+
+            fetch(URL_WEB_APP_ARKIB2, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("Rekod Arkib 2 Berjaya Dihantar!");
+                statusContainer.classList.add('hidden');
+                resetArkibForm();
+            })
+            .catch(err => {
+                alert("Ralat penghantaran Arkib 2: " + err.message);
+                statusContainer.classList.add('hidden');
+            });
         }
     </script>
 </body>
